@@ -110,8 +110,8 @@ class AccountController extends Controller
         $user->setActive(1);
         $em->flush();
 
-        //return $this->redirectToRoute('account_register');
-        return new Response('<html><body>Hello '.$activatioinLink.'!</body></html>');
+        return $this->redirectToRoute('account_register');
+        //return new Response('<html><body>Hello '.$activatioinLink.'!</body></html>');
     }
 
     public function sendEmail($user) 
