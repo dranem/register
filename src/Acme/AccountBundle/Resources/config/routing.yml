@@ -3,10 +3,14 @@ account_register:
     path:     /register
     defaults: { _controller: AcmeAccountBundle:Account:register }
 
+account_login:
+    path:     /register/login/{activationLink}
+    defaults: { _controller: AcmeAccountBundle:Account:login }
+
 account_create:
     path:     /register/create
     defaults: { _controller: AcmeAccountBundle:Account:create }
 
 activate_account:
-    path:     /register/activate/{activatioinLink}
+    path:     /register/activate/{activationLink}
     defaults: { _controller: AcmeAccountBundle:Account:activate }
