@@ -5,6 +5,10 @@
         <title>{% block title %}Welcome!{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        <style>
+            div {clear:both;padding:5px 0 5px 0;}
+            div label {padding:5px;}
+        </style>
     </head>
     <body>
         {% block body %}{% endblock %}

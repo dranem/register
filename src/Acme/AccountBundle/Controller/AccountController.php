@@ -32,12 +32,13 @@ class AccountController extends Controller
             array('activationLink' => $activationLink, 'active' => 1)
         );
 
-        if($user) 
+        if($user) {
             $msg = 'You have successfully activated your account.';
-        else 
+            $user->setActivationLink(null);
+        } else 
             $msg = '';
 
-        $user->setActivationLink(null);
+        
         $em->flush();
         
         return $this->render(
@@ -58,12 +59,12 @@ class AccountController extends Controller
             $registration = $form->getData();
 
             $password = $registration->getUser()->getPlainPassword();
-            $registration->getUser()->setPlainPassword(hash('sha256',$password)); 
-            $password2 = $registration->getUser()->getPlainPassword();
+            $registration->getUser()->setPlainPassword(hash('sha256',$password));
             $activationLink = $registration->getUser()->getEmail();
             $registration->getUser()->setActivationLink($activationLink);
             $em->persist($registration->getUser());
             $em->flush();
+            $this->sendEmail($registration->getUser(),$password,$registration->getUser()->getActivationLink());
 
             return new Response('Account created');
         }
@@ -81,9 +82,13 @@ class AccountController extends Controller
         $user = $em->getRepository('AcmeAccountBundle:User')->findOneByactivationLink($activationLink);
 
         if (!$user) {
-            throw $this->createNotFoundException(
-                'Invalid Link'
-            );
+            //throw $this->createNotFoundException(
+            //    'Invalid Link'
+            //);
+            
+            return $this->render(
+                'AcmeAccountBundle:Account:login.html.twig',
+                array('msg' => 'Invalid Link'));
         }
 
         $user->setActive(1);
@@ -92,10 +97,12 @@ class AccountController extends Controller
         return $this->redirectToRoute('account_login',array('activationLink' => $activationLink));
     }
 
-    public function sendEmail($user) 
+    public function sendEmail($user, $password, $activationLink) 
     {
         $from = 'menardjosef.morales@chromedia.com';
         $to = $user->getEmail();
+        
+        $url = $this->generateUrl('activate_account', array('activationLink' => $activationLink), true);
 
         $mailer = $this->get('mailer');
         $message = $mailer->createMessage()
@@ -106,7 +113,7 @@ class AccountController extends Controller
             $this->renderView(
                 // app/Resources/views/Emails/registration.html.twig
                 'Emails/registration.html.twig',
-                array('user' => 'test')
+                array('user' => $user, 'password' => $password, 'activationLink' => $url)
             ),
             'text/html'
         )
