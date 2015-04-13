@@ -5,4 +5,5 @@ build/
 bin/*
 app/cache/*
 app/logs/*.log
+app/src/Acme/DemoBundle/
 app/config/parameters.yml
