@@ -22,6 +22,8 @@ Acme\AccountBundle\Entity\User:
             length: 255
         active:
             type: boolean
+            options:
+              default: 0
         activationLink:
             type: string
             length: 255
