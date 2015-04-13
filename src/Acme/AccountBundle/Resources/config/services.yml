@@ -1,0 +1,3 @@
+services:
+    sha256salted_encoder:
+        class: Acme\AccountBundle\Service\Sha256Salted

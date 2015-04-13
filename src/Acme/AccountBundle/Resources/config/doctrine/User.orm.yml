@@ -1,0 +1,28 @@
+Acme\AccountBundle\Entity\User:
+    type: entity
+    table: user
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        email:
+            type: string
+            length: 255
+        plainPassword:
+            type: string
+            length: 255
+        firstName:
+            type: string
+            length: 255
+        lastName:
+            type: string
+            length: 255
+        active:
+            type: boolean
+        activationLink:
+            type: string
+            length: 255
+    lifecycleCallbacks: {  }

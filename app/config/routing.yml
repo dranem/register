@@ -1,0 +1,2 @@
+app:
+    resource: "@AcmeAccountBundle/Resources/config/routing.yml"

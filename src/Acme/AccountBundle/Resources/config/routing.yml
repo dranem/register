@@ -1,0 +1,12 @@
+# src/Acme/AccountBundle/Resources/config/routing.yml
+account_register:
+    path:     /register
+    defaults: { _controller: AcmeAccountBundle:Account:register }
+
+account_create:
+    path:     /register/create
+    defaults: { _controller: AcmeAccountBundle:Account:create }
+
+activate_account:
+    path:     /register/activate/{activatioinLink}
+    defaults: { _controller: AcmeAccountBundle:Account:activate }

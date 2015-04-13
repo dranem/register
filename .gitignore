@@ -1,0 +1,8 @@
+composer.lock
+composer.phar
+vendor/
+build/
+bin/*
+app/cache/*
+app/logs/*.log
+app/config/parameters.yml
