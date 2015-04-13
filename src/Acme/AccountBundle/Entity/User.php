@@ -26,13 +26,12 @@ class User
      * @Assert\Email()
      */
     private $email;
-
     /**
-     * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Length(
      *  min = 6, 
-     *  max = 4096
+     *  max = 4096,
+     *  minMessage = "Your passowrd must be at least {{ limit }} characters long"
      * )
      */
     private $plainPassword;
@@ -101,7 +100,8 @@ class User
      */
     public function setPlainPassword($plainPassword)
     {
-        $this->plainPassword = hash('sha256',$plainPassword);
+        $this->plainPassword = $plainPassword;
+        //$this->plainPassword = hash('sha256',$plainPassword);
 
         return $this;
     }

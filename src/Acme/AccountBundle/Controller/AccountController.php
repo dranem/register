@@ -57,6 +57,9 @@ class AccountController extends Controller
 
             $registration = $form->getData();
 
+            $password = $registration->getUser()->getPlainPassword();
+            $registration->getUser()->setPlainPassword(hash('sha256',$password)); 
+            $password2 = $registration->getUser()->getPlainPassword();
             $activationLink = $registration->getUser()->getEmail();
             $registration->getUser()->setActivationLink($activationLink);
             $em->persist($registration->getUser());

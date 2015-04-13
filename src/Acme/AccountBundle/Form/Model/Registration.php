@@ -27,17 +27,4 @@ class Registration
         return $this->user;
     }
 
-
-
-/*
-    public function getTermsAccepted()
-    {
-        return $this->termsAccepted;
-    }
-
-    public function setTermsAccepted($termsAccepted)
-    {
-        $this->termsAccepted = (Boolean) $termsAccepted;
-    }
-    */
 }

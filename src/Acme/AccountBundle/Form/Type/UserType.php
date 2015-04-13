@@ -19,9 +19,6 @@ class UserType extends AbstractType
         ));
         $builder->add('firstName','text');
         $builder->add('lastName','text');
-        //$builder->add('activationLink', 'hidden', array(
-        //    'data' => md5(rand(0,1000)),
-        //));
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
