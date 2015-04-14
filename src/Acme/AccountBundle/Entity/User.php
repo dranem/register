@@ -6,12 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity
  * @UniqueEntity(fields="email", message="Email already taken")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id
@@ -58,6 +59,11 @@ class User
      */
     private $activationLink;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max = 4096)
+     */
+    private $salt;
 
     /**
      * Get id
@@ -194,5 +200,44 @@ class User
     public function setActivationLink($activationLink)
     {
         $this->activationLink =  md5($activationLink.time());
+
+        return $this;
+    }
+
+    /**
+     * Set password
+     *
+     * @param string $salt
+     * @return User
+     */
+    public function setSalt($salt)
+    {
+        $this->salt = $salt;
+
+        return $this;
+    }
+    /**
+     * Get salt
+     *
+     * @return string 
+     */
+    public function getSalt()
+    {
+        return $this->salt;
+    }
+
+    public function getRoles() {
+
+    }
+    public function getPassword() {
+
+    }
+
+    public function getUsername() {
+
+    }
+
+    public function eraseCredentials() {
+
     }
 }

@@ -5,6 +5,7 @@ namespace Acme\AccountBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Acme\AccountBundle\Form\Type\RegistrationType;
 use Acme\AccountBundle\Form\Model\Registration;
+use Acme\AccountBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -45,22 +46,37 @@ class AccountController extends Controller
 
     public function createAction(Request $request)
     {
+        //$user = new User();
+        
+
+        
         $em = $this->getDoctrine()->getManager();
 
         $form = $this->createForm(new RegistrationType(), new Registration());
 
         $form->handleRequest($request);
 
+
         if ($form->isValid()) {
 
             $registration = $form->getData();
+            $repo = $registration->getUser();
 
-            $password = $registration->getUser()->getPlainPassword();
-            $registration->getUser()->setPlainPassword(hash('sha256',$password));
-            $activationLink = $registration->getUser()->getEmail();
-            $registration->getUser()->setActivationLink($activationLink);
-            $em->persist($registration->getUser());
+            //$password = $registration->getUser()->getPlainPassword();
+            //$registration->getUser()->setPlainPassword(hash('sha256',$password));
+            $repo->setSalt(uniqid(mt_rand())); 
+            $activationLink = $repo->getEmail();
+            //$activationLink = $registration->getUser()->getEmail();
+            $encoder = $this->container->get('security.encoder_factory')->getEncoder($repo);
+            $password = $encoder->encodePassword($repo->getPlainPassword(), $repo->getSalt());
+            $repo->getPlainPassword($password);
+            $repo->setActivationLink($activationLink);
+            //$registration->getUser()->setActivationLink($activationLink);
+
+            $em->persist($repo);
+            //$em->persist($registration->getUser());
             $em->flush();
+
             $this->sendEmail($registration->getUser(),$password,$registration->getUser()->getActivationLink());
 
             $this->addFlash('notice', 'Congratulations, Account created!');
