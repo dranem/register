@@ -33,17 +33,14 @@ class AccountController extends Controller
         );
 
         if($user) {
-            $msg = 'You have successfully activated your account.';
+            $this->addFlash('notice', 'You have successfully activated your account.');
             $user->setActivationLink(null);
-        } else 
-            $msg = '';
-
+        }
         
         $em->flush();
         
         return $this->render(
-            'AcmeAccountBundle:Account:login.html.twig',
-            array('msg' => $msg));
+            'AcmeAccountBundle:Account:login.html.twig');
     }
 
     public function createAction(Request $request)
