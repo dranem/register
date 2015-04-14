@@ -1,5 +1,11 @@
 {# src/Acme/AccountBundle/Resources/views/Account/register.html.twig #}
 {% extends 'base.html.twig' %}
 {% block body %}
+	{% for flashMessage in app.session.flashbag.get('notice') %}
+	<div class="flash-notice">
+	    {{ flashMessage }}
+	</div>
+	{% endfor %}
+
 	{{ form(form) }}
 {% endblock %}

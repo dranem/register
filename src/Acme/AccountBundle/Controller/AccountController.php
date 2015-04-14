@@ -66,7 +66,8 @@ class AccountController extends Controller
             $em->flush();
             $this->sendEmail($registration->getUser(),$password,$registration->getUser()->getActivationLink());
 
-            return new Response('Account created');
+            $this->addFlash('notice', 'Congratulations, Account created!');
+            //return new Response('Account created');
         }
 
         return $this->render(
