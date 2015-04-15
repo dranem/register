@@ -36,9 +36,8 @@ class AccountController extends Controller
         if($user) {
             $this->addFlash('notice', 'You have successfully activated your account.');
             $user->setActivationLink(null);
+            $em->flush();
         }
-        
-        $em->flush();
         
         return $this->render(
             'AcmeAccountBundle:Account:login.html.twig');
@@ -105,7 +104,7 @@ class AccountController extends Controller
     {
         $from = 'menardjosef.morales@chromedia.com';
         $to = $user->getEmail();
-        
+
         $url = $this->generateUrl('activate_account', array('activationLink' => $activationLink), true);
 
         $mailer = $this->get('mailer');
