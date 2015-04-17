@@ -19,14 +19,14 @@ class User implements UserInterface
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      * @Assert\Email()
      */
-    private $email;
+    protected $email;
     /**
      * @Assert\NotBlank()
      * @Assert\Length(
@@ -35,35 +35,35 @@ class User implements UserInterface
      *  minMessage = "Your passowrd must be at least {{ limit }} characters long"
      * )
      */
-    private $plainPassword;
+    protected $plainPassword;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      */
-    private $firstName;
+    protected $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
      */
-    private $lastName;
+    protected $lastName;
 
     /**
-     * @var boolean
+     * @ORM\Column(type="boolean", options={"default":0})
      */
-    private $active = 0;
+    protected $active = 0;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $activationLink;
+    protected $activationLink;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(max = 4096)
      */
-    private $salt;
+    protected $salt;
 
     /**
      * Get id

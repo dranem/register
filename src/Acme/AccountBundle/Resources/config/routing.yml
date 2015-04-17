@@ -14,3 +14,18 @@ account_create:
 activate_account:
     path:     /register/activate/{activationLink}
     defaults: { _controller: AcmeAccountBundle:Account:activate }
+
+login:
+    path:     /login
+    defaults: { _controller: AcmeAccountBundle:Account:doLogin }
+
+logout:
+    path:     /logout
+    defaults: { _controller: AcmeAccountBundle:Account:logout }
+
+account_home:
+    path:     /home
+    defaults: { _controller: AcmeAccountBundle:Account:home }
+
+login_check:
+    pattern:   /login_check

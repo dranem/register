@@ -3,6 +3,7 @@
 namespace Acme\AccountBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Acme\AccountBundle\Form\Type\RegistrationType;
 use Acme\AccountBundle\Form\Model\Registration;
 use Acme\AccountBundle\Entity\User;
@@ -11,8 +12,42 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AccountController extends Controller
 {
+    public function isLogin($user)
+    {
+        if($user) 
+
+            return true;
+        else
+            return false;
+    }
+
+    public function homeAction(Request $request)
+    {
+        
+        $user = $this->get('session')->get('uid');
+        if(!$this->isLogin($user))
+            return $this->redirectToRoute('login');
+            
+        return $this->render(
+            'AcmeAccountBundle:Account:home.html.twig',
+            array('user' => $user)
+        );
+    }
+
+    public function logoutAction() {
+        $this->get('session')->clear();
+        return $this->render(
+            'AcmeAccountBundle:Account:login.html.twig'
+        );
+    }
+
     public function registerAction()
     {
+        
+        $user = $this->get('session')->get('uid');
+        if($this->isLogin($user))
+            return $this->redirectToRoute('account_home');
+        
         $registration = new Registration();
 
         $form = $this->createForm(new RegistrationType(), $registration, array(
@@ -22,8 +57,43 @@ class AccountController extends Controller
         return $this->render(
             'AcmeAccountBundle:Account:register.html.twig',
             array('form' => $form->createView())
-        );
+        ); 
+    }
 
+    public function doLoginAction(Request $request)
+    {
+        $user_exist = false;
+        $checkpassword = false;
+
+        $user = $this->get('session')->get('uid');
+        if($user)
+            return $this->redirectToRoute('account_home');
+
+        if ($request->getMethod() == 'POST') {
+            $username = $request->request->get('username');
+            $password = $request->request->get('password');
+            $em = $this->getDoctrine()->getManager();
+            $user_exist = $em->getRepository('AcmeAccountBundle:User')->findOneBy(
+                array('email' => $username, 'active' => 1)
+            );
+
+            if($user_exist) {
+                $encoder = $this->container->get('security.encoder_factory')->getEncoder($user_exist);
+                $checkpassword = $encoder->isPasswordValid($user_exist->getPlainPassword(), $password, $user_exist->getSalt());
+            }
+            if($checkpassword) {
+                $session = $request->getSession();
+                $session->start();
+                $session->set('uid', $user_exist);
+                return $this->redirectToRoute('account_home');
+            }
+            else
+                $this->addFlash('notice', 'Invalid username or password');
+        }
+    
+        return $this->render(
+            'AcmeAccountBundle:Account:login.html.twig'
+        );
     }
 
     public function loginAction($activationLink = null)
@@ -40,19 +110,24 @@ class AccountController extends Controller
         }
         
         return $this->render(
-            'AcmeAccountBundle:Account:login.html.twig');
+            'AcmeAccountBundle:Account:login.html.twig'
+        );
     }
 
     public function createAction(Request $request)
     {
+        $user = $this->get('session')->get('uid');
+        if($user)
+            return $this->redirectToRoute('account_home');
+
         $em = $this->getDoctrine()->getManager();
 
         $form = $this->createForm(new RegistrationType(), new Registration());
 
         $form->handleRequest($request);
-
+        
         if ($form->isValid()) {
-
+   
             $registration = $form->getData();
             $repo = $registration->getUser();
 
@@ -60,7 +135,7 @@ class AccountController extends Controller
             $activationLink = $repo->getEmail();
             $encoder = $this->container->get('security.encoder_factory')->getEncoder($repo);
             $password = $encoder->encodePassword($repo->getPlainPassword(), $repo->getSalt());
-            $repo->getPlainPassword($password);
+            $repo->setPlainPassword($password);
             $repo->setActivationLink($activationLink);
 
             $em->persist($repo);
@@ -69,8 +144,11 @@ class AccountController extends Controller
             $this->sendEmail($registration->getUser(), $registration->getUser()->getActivationLink());
 
             $this->addFlash('notice', 'Congratulations, Account created!');
-            //return new Response('Account created');
+            return $this->render(
+                'AcmeAccountBundle:Account:login.html.twig'
+            );
         }
+
 
         return $this->render(
             'AcmeAccountBundle:Account:register.html.twig',
@@ -85,10 +163,6 @@ class AccountController extends Controller
         $user = $em->getRepository('AcmeAccountBundle:User')->findOneByactivationLink($activationLink);
 
         if (!$user) {
-            //throw $this->createNotFoundException(
-            //    'Invalid Link'
-            //);
-            
             return $this->render(
                 'AcmeAccountBundle:Account:login.html.twig',
                 array('msg' => 'Invalid Link'));

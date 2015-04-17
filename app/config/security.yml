@@ -13,6 +13,10 @@ security:
 
     # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
     providers:
+        main:
+            entity:
+                class: Acme\AccountBundle\Entity\User
+                property: email
         in_memory:
             memory:
                 users:
@@ -23,6 +27,12 @@ security:
     # for specific sections of your app
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
+        #default:
+        #    anonymous: ~
+        #    http_basic: ~
+        #    form_login:
+        #        login_path: /login
+        #        check_path: /login_check
         dev:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -51,3 +61,4 @@ security:
     # http://symfony.com/doc/current/cookbook/security/access_control.html
     access_control:
         #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }
+        - { path: ^/main, roles: ROLE_USER }
