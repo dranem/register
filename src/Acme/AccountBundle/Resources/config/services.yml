@@ -1,3 +1,6 @@
 services:
     sha256salted_encoder:
         class: Acme\AccountBundle\Service\Sha256Salted
+    app.manage_controller:
+        class: Acme\AccountBundle\Controller\ManageController
+        arguments: [@session]

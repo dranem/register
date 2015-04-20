@@ -24,7 +24,7 @@ class AccountController extends Controller
     {
         
         $user = $this->get('session')->get('uid');
-        if(!$this->isLogin($user))
+        if(!$this->get('app.manage_controller')->isloginAction())
             return $this->redirectToRoute('login');
             
         return $this->render(
@@ -43,8 +43,8 @@ class AccountController extends Controller
     public function registerAction()
     {
         
-        $user = $this->get('session')->get('uid');
-        if($this->isLogin($user))
+        //$user = $this->get('session')->get('uid');
+        if($this->get('app.manage_controller')->isloginAction())
             return $this->redirectToRoute('account_home');
         
         $registration = new Registration();
@@ -64,8 +64,8 @@ class AccountController extends Controller
         $user_exist = false;
         $checkpassword = false;
 
-        $user = $this->get('session')->get('uid');
-        if($user)
+        //$user = $this->get('session')->get('uid');
+        if($this->get('app.manage_controller')->isloginAction())
             return $this->redirectToRoute('account_home');
 
         if ($request->getMethod() == 'POST') {
@@ -115,8 +115,8 @@ class AccountController extends Controller
 
     public function createAction(Request $request)
     {
-        $user = $this->get('session')->get('uid');
-        if($user)
+        //$user = $this->get('session')->get('uid');
+        if($this->get('app.manage_controller')->isloginAction())
             return $this->redirectToRoute('account_home');
 
         $em = $this->getDoctrine()->getManager();
