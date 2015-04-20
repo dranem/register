@@ -4,6 +4,7 @@ namespace Acme\AccountBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Validator\Constraints as Assert;
 use Acme\AccountBundle\Form\Type\RegistrationType;
 use Acme\AccountBundle\Form\Model\Registration;
 use Acme\AccountBundle\Entity\User;
@@ -69,25 +70,39 @@ class AccountController extends Controller
             return $this->redirectToRoute('account_home');
 
         if ($request->getMethod() == 'POST') {
-            $username = $request->request->get('username');
-            $password = $request->request->get('password');
-            $em = $this->getDoctrine()->getManager();
-            $user_exist = $em->getRepository('AcmeAccountBundle:User')->findOneBy(
-                array('email' => $username, 'active' => 1)
+
+            $emailConstraint = new Assert\Email();
+
+            $emailConstraint->message = 'Invalid email address';
+
+            $errorList = $this->get('validator')->validate(
+                $request->request->get('username'),
+                $emailConstraint
             );
 
-            if($user_exist) {
-                $encoder = $this->container->get('security.encoder_factory')->getEncoder($user_exist);
-                $checkpassword = $encoder->isPasswordValid($user_exist->getPlainPassword(), $password, $user_exist->getSalt());
+            if (0 === count($errorList)) {
+                $username = $request->request->get('username');
+                $password = $request->request->get('password');
+                $em = $this->getDoctrine()->getManager();
+                $user_exist = $em->getRepository('AcmeAccountBundle:User')->findOneBy(
+                    array('email' => $username, 'active' => 1)
+                );
+
+                if($user_exist) {
+                    $encoder = $this->container->get('security.encoder_factory')->getEncoder($user_exist);
+                    $checkpassword = $encoder->isPasswordValid($user_exist->getPlainPassword(), $password, $user_exist->getSalt());
+                }
+                if($checkpassword) {
+                    $session = $request->getSession();
+                    $session->start();
+                    $session->set('uid', $user_exist);
+                    return $this->redirectToRoute('account_home');
+                } else
+                    $this->addFlash('notice', 'Invalid username or password');
+            } else {
+                $errorMessage = $errorList[0]->getMessage();
+                $this->addFlash('notice', $errorMessage);  
             }
-            if($checkpassword) {
-                $session = $request->getSession();
-                $session->start();
-                $session->set('uid', $user_exist);
-                return $this->redirectToRoute('account_home');
-            }
-            else
-                $this->addFlash('notice', 'Invalid username or password');
         }
     
         return $this->render(
