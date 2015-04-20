@@ -23,6 +23,7 @@ class LoginType extends AbstractType
                    new NotBlank(),
                    new Length(array('min' => 6)),
                ),
+               'label' => 'Password',
            ))
            ->add('Register', 'submit')
         ;
