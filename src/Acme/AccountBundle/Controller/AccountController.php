@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
 use Acme\AccountBundle\Form\Type\RegistrationType;
+use Acme\AccountBundle\Form\Type\LoginType;
 use Acme\AccountBundle\Form\Model\Registration;
 use Acme\AccountBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,9 +37,8 @@ class AccountController extends Controller
 
     public function logoutAction() {
         $this->get('session')->clear();
-        return $this->render(
-            'AcmeAccountBundle:Account:login.html.twig'
-        );
+
+        return $this->redirectToRoute('login');
     }
 
     public function registerAction()
@@ -65,7 +65,45 @@ class AccountController extends Controller
         $user_exist = false;
         $checkpassword = false;
 
-        //$user = $this->get('session')->get('uid');
+        if($this->get('app.manage_controller')->isloginAction())
+            return $this->redirectToRoute('account_home');
+
+        $dafultvalues = array('email', 'plainPassword');
+        $form = $this->createForm(new LoginType(), $dafultvalues);
+
+        $em = $this->getDoctrine()->getManager();
+
+        $form->handleRequest($request);
+        
+        if ($form->isValid()) {
+   
+            $userdata = $form->getData();
+            $password = $userdata['plainPassword'];
+
+            $em = $this->getDoctrine()->getManager();
+            $user_exist = $em->getRepository('AcmeAccountBundle:User')->findOneBy(
+                array('email' => $userdata['email'], 'active' => 1)
+            );
+
+            if($user_exist) {
+                $encoder = $this->container->get('security.encoder_factory')->getEncoder($user_exist);
+                $checkpassword = $encoder->isPasswordValid($user_exist->getPlainPassword(), $password, $user_exist->getSalt());
+            }
+            if($checkpassword) {
+                $session = $request->getSession();
+                $session->start();
+                $session->set('uid', $user_exist);
+                return $this->redirectToRoute('account_home');
+            } else
+                $this->addFlash('notice', 'Invalid username or password');
+
+        }
+        return $this->render(
+            'AcmeAccountBundle:Account:login.html.twig',
+            array('form' => $form->createView())
+        ); 
+
+        /*
         if($this->get('app.manage_controller')->isloginAction())
             return $this->redirectToRoute('account_home');
 
@@ -108,6 +146,7 @@ class AccountController extends Controller
         return $this->render(
             'AcmeAccountBundle:Account:login.html.twig'
         );
+        */
     }
 
     public function loginAction($activationLink = null)
