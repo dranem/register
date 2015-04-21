@@ -25,7 +25,7 @@ class LoginType extends AbstractType
                ),
                'label' => 'Password',
            ))
-           ->add('Register', 'submit')
+           ->add('Login', 'submit')
         ;
        
     }
