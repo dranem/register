@@ -69,7 +69,7 @@ class AccountController extends Controller
             return $this->redirectToRoute('account_home');
 
         $dafultvalues = array('email', 'plainPassword');
-        $form = $this->createForm(new LoginType(), $dafultvalues);
+        $form = $this->createForm(new LoginType());
 
         $em = $this->getDoctrine()->getManager();
 
