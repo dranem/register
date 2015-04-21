@@ -86,7 +86,7 @@ class AccountController extends Controller
             );
 
             if($user_exist) {
-                $encoder = $this->container->get('security.encoder_factory')->getEncoder($user_exist);
+                $encoder = $this->container->get('security.sha256salted_encoder')->getEncoder($user_exist);
                 $checkpassword = $encoder->isPasswordValid($user_exist->getPlainPassword(), $password, $user_exist->getSalt());
             }
             if($checkpassword) {
@@ -197,9 +197,11 @@ class AccountController extends Controller
             $this->sendEmail($registration->getUser(), $registration->getUser()->getActivationLink());
 
             $this->addFlash('notice', 'Congratulations, Account created!');
-            return $this->render(
-                'AcmeAccountBundle:Account:login.html.twig'
-            );
+            //return $this->render(
+            //    'AcmeAccountBundle:Account:login.html.twig',
+            //    array('form' => $form->createView())
+            //);
+            return $this->redirectToRoute('login');
         }
 
 
