@@ -86,7 +86,7 @@ class AccountController extends Controller
             );
 
             if($user_exist) {
-                $encoder = $this->container->get('security.sha256salted_encoder')->getEncoder($user_exist);
+                $encoder = $this->container->get('security.encoder_factory')->getEncoder($user_exist);
                 $checkpassword = $encoder->isPasswordValid($user_exist->getPlainPassword(), $password, $user_exist->getSalt());
             }
             if($checkpassword) {
