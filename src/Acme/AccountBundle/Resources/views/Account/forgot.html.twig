@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 {% block body %}
-	<h1>Login</h1>
+	<h1>Forgot Password</h1>
 	{% for flashMessage in app.session.flashbag.get('notice') %}
 	<div class="flash-notice">
 	    {{ flashMessage }}
 	</div>
 	{% endfor %}
 	{{ form(form) }}
-	<a href ="{{ path('forgot_pass') }}">Forgot password?</a>&nbsp;
 	<a href ="{{ path('account_register') }}">Sign up</a>
+	<a href ="{{ path('login') }}">Login</a>
 {% endblock %}

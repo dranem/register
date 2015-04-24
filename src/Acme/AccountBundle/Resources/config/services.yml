@@ -4,3 +4,11 @@ services:
     app.manage_controller:
         class: Acme\AccountBundle\Controller\ManageController
         arguments: [@session]
+    app.sendemail_controller:
+        class: Acme\AccountBundle\Controller\SendEmailController
+        #arguments: [@templating, @mailer, @session]
+        calls:
+            - [ setContainer, [ @service_container ]]
+    acme.validator.oldpassword:
+        class: Acme\AccountBundle\Validator\Constraints\EqualstoOldPasswordValidator
+        arguments: [@session]

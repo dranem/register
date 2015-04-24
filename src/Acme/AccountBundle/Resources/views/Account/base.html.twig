@@ -11,7 +11,7 @@
         </style>
     </head>
     <body>
-        {% block islogin %}{% endblock %}
+        {{ render(controller('AcmeAccountBundle:Account:header')) }}
         {% block body %}{% endblock %}
         {% block javascripts %}{% endblock %}
     </body>

@@ -46,5 +46,5 @@ assetic:
 
 swiftmailer:
     transport: gmail
-    username:  me@gmail.com
-    password:  mypass
+    username:  yawnard@gmail.com
+    password:  amawkauka061211

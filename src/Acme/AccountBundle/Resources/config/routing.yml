@@ -27,5 +27,21 @@ account_home:
     path:     /home
     defaults: { _controller: AcmeAccountBundle:Account:home }
 
+update:
+    path:     /update
+    defaults: { _controller: AcmeAccountBundle:Account:updateUser }
+
+update_pass:
+    path:     /update_password
+    defaults: { _controller: AcmeAccountBundle:Account:updatePassword }
+
+forgot_pass:
+    path:     /forgot
+    defaults: { _controller: AcmeAccountBundle:Account:forgotPassword }
+
 login_check:
     pattern:   /login_check
+
+activate_pass:
+    path:      /activate_pass/{token}
+    defaults: { _controller: AcmeAccountBundle:Account:activatePassword }

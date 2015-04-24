@@ -37,6 +37,7 @@ class User implements UserInterface
      */
     protected $plainPassword;
 
+
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank()
@@ -61,9 +62,19 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     */
+    protected $resetpassLink;
+
+    /**
+     * @ORM\Column(type="string", length=255)
      * @Assert\Length(max = 4096)
      */
     protected $salt;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $resetlinkDate;
 
     /**
      * Get id
@@ -204,6 +215,32 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getResetpassLink()
+    {
+        return $this->resetpassLink;//md5(rand(0,1000));
+    }
+
+    public function setResetpassLink($resetpassLink)
+    {
+        $this->resetpassLink =  md5($resetpassLink.time());
+
+        return $this;
+    }
+
+    public function getResetlinkDate()
+    {
+        return $this->resetlinkDate;//md5(rand(0,1000));
+    }
+
+    public function setResetlinkDate($resetlinkDate)
+    {
+        $this->resetlinkDate =  $resetlinkDate;
+
+        return $this;
+    }
+
+    
+
     /**
      * Set password
      *
@@ -229,8 +266,13 @@ class User implements UserInterface
     public function getRoles() {
 
     }
-    public function getPassword() {
+    public function setPassword($password) {
+        $this->password = $password;
 
+        return $this;
+    }
+    public function getPassword() {
+        return $this->password;
     }
 
     public function getUsername() {

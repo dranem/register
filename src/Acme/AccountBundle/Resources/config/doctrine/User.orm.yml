@@ -30,4 +30,11 @@ Acme\AccountBundle\Entity\User:
         activationLink:
             type: string
             length: 255
+        resetpassLink:
+            type: string
+            length: 255
+            nullable: true
+        resetlinkDate:
+            type: datetime
+            nullable: true
     lifecycleCallbacks: {  }
