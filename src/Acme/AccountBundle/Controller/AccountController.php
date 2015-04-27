@@ -11,6 +11,7 @@ use Acme\AccountBundle\Form\Type\UserType;
 use Acme\AccountBundle\Form\Type\ForgotPasswordType;
 use Acme\AccountBundle\Form\Type\UpdateType;
 use Acme\AccountBundle\Form\Type\ChangePasswordType;
+use Acme\AccountBundle\Form\Type\ResetPasswordType;
 use Acme\AccountBundle\Form\Model\Registration;
 use Acme\AccountBundle\Form\Model\ChangePassword;
 //use Acme\AccountBundle\Form\Model\UserUpdate;
@@ -218,8 +219,10 @@ class AccountController extends Controller
             $em->persist($repo);
             $em->flush();
 
-            $this->sendEmail($registration->getUser(), $pass, $registration->getUser()->getActivationLink());
-
+            //$this->sendEmail($registration->getUser(), $pass, $registration->getUser()->getActivationLink());
+            $url = $this->generateUrl('activate_account', array('activationLink' => $registration->getUser()->getActivationLink()), true);
+            $array_data = array('user' => $registration->getUser(), 'subject' => 'You have Completed Registration!', 'password' => $pass, 'activationLink' => $url, 'template' => 'Emails/registration.html.twig');
+            $this->get('app.sendemail_controller')->SendEmailToUserAction($array_data);
             $this->addFlash('notice', 'Congratulations, Account created!');
             //return $this->render(
             //    'AcmeAccountBundle:Account:login.html.twig',
@@ -292,14 +295,24 @@ class AccountController extends Controller
         if(!$this->get('app.manage_controller')->isloginAction())
             return $this->redirectToRoute('login');
 
-        $user = $this->get('session')->get('uid');
-        print_r($user);
+        $user_session = $this->get('session')->get('uid');
+
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository('AcmeAccountBundle:User')->find($user_session->getId());
+        //print_r($user);
         $form = $this->createForm(new ChangePasswordType(), new ChangePassword());
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $data = $form->getData();
-            var_dump($data);
+            $user->setSalt(uniqid(mt_rand()));
+            $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+            $password = $encoder->encodePassword($data->getNewPassword(), $user->getSalt());
+            $user->setPlainPassword($password);
+            $em->flush();
+            $this->addFlash('notice', 'Password successfully updated');
+            //echo $data->getNewPassword();
+            //var_dump($data);exit;
         }
 
         return $this->render(
@@ -308,9 +321,66 @@ class AccountController extends Controller
         );
     }
 
-    public function activatePasswordAction($token)
+    public function activatePasswordAction(Request $request, $token)
     {
-        echo 1;
+        if($this->get('app.manage_controller')->isloginAction())
+            return $this->redirectToRoute('account_home');
+        $form = $this->createForm(new ResetPasswordType());
+
+        $form->handleRequest($request);
+
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->getRepository('AcmeAccountBundle:User')->findOneByresetpassLink($token);
+
+        if(!$user) {
+            $this->addFlash('notice', 'Link expired');
+            return $this->redirectToRoute('forgot_pass');
+        }
+
+        if($user) {
+            $date1 = $user->getResetlinkDate();
+            $datelink1 = $date1->format('Y-m-d H:i:s');
+
+            $date2 = new \DateTime($datelink1);
+            $date2->add(new \DateInterval('P1D'));
+            $date2->format('Y-m-d H:i:s');
+
+            $now = new \DateTime('now');
+            $now->format('Y-m-d H:i:s');
+
+            if($date2 < $now) {
+                $user->setResetpassLink(null);
+                $em->flush();
+                $this->addFlash('notice', 'Link expired');
+                return $this->redirectToRoute('forgot_pass');
+            }
+        }
+
+        if ($form->isValid()) {
+            $data = $form->getData();
+
+            if($user) {
+                if($date2 >= $now) {
+                    $user->setSalt(uniqid(mt_rand())); 
+                    $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
+                    $password = $encoder->encodePassword($data['plainPassword'], $user->getSalt());
+                    $user->setPlainPassword($password);
+                    
+                    $em->flush();
+                    $this->addFlash('notice', 'Password successfully reset');
+                    return $this->redirectToRoute('login');
+                } else {
+                    $user->setResetpassLink(null);
+                    $this->addFlash('notice', 'Link expired');
+                    return $this->redirectToRoute('forgot_pass');
+                }
+                    
+            }
+        }
+        return $this->render(
+            'AcmeAccountBundle:Account:activatePassword.html.twig',
+            array('form' => $form->createView())
+        );
     }
 
     public function forgotPasswordAction(Request $request) {
@@ -333,7 +403,7 @@ class AccountController extends Controller
                 $user->setResetlinkDate(new \DateTime("now"));
                 $user->setResetpassLink(uniqid(mt_rand()));
                 $em->flush();
-                $array_data = array('user' => $user);
+                $array_data = array('user' => $user, 'subject' => 'Reset Password', 'template' => 'Emails/forgot.html.twig');
                 $this->get('app.sendemail_controller')->SendEmailToUserAction($array_data);
                     $this->addFlash('notice', 'Successfully sent. Pleas check your email');
                 /*
@@ -372,7 +442,9 @@ class AccountController extends Controller
         $user->setActive(1);
         $em->flush();
 
-        return $this->redirectToRoute('account_login',array('activationLink' => $activationLink));
+        $this->addFlash('notice', 'You have successfully activated your account.');
+        return $this->redirectToRoute('login');
+        //return $this->redirectToRoute('account_login',array('activationLink' => $activationLink));
     }
 
     public function sendEmail($user, $pass, $activationLink) 

@@ -14,7 +14,7 @@ class ChangePassword
      *     min = 6,
      *     minMessage = "Password should by at least 6 chars long"
      * )
-     * 
+     * @AcmeAssert\EqualstoOldPassword
      */
     //@AcmeAssert\EqualstoOldPassword
     protected $oldPassword;
@@ -28,15 +28,17 @@ class ChangePassword
     protected $newPassword;
 
     /**
-     * @Assert\Callback
+     * 
      */
-    public function validate(ExecutionContextInterface $context)
+    //@Assert\Callback
+    /*public function validate(ExecutionContextInterface $context)
     {
         //$user = $this->session->get('uid');
         //print_r($context);
-        echo $context->getEmail();
+        //echo $context->getEmail();
         //if($value != 'test') echo 'dili';
     }
+    */
 
 
     public function setOldPassword($oldPassword)

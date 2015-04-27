@@ -11,26 +11,32 @@ class EqualstoOldPasswordValidator extends ConstraintValidator
 {
     protected $session;
 
-    public function __construct($session)
+    public function __construct(Session $session)
     {
-        var_dump($session); exit;
+        //var_dump($session); exit;
         $this->session = $session;
         //$this->session = new Session();
     }
     
+
     
 
     public function validate($value, Constraint $constraint)
     {
-        if($value != 'test') {$user = $this->session;
-echo 1;            print_r($user);
-        //$user = $this->get('session')->get('uid');
-        //$id = $user->getId();echo $id;
-            exit;
-        //if (!preg_match('/^[a-zA-Za0-9]+$/', $value, $matches)) {
-            // If you're using the new 2.5 validation API (you probably are!)
+        //echo $value;echo '<br />';
+        $user = $this->session->get('uid');
+
+        //hash('sha256', $salt . $raw);
+        $pass = hash('sha256', $user->getSalt() . $value);
+        //echo $pass;
+        //if($user->getPlainPassword() === $pass)
+        //    echo 'pareho';
+        //else echo 'dili';
+
+
+
+        if($user->getPlainPassword() !== $pass) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('%string%', $value)
                 ->addViolation();
 
             // If you're using the old 2.4 validation API

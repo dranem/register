@@ -1,9 +1,9 @@
-<p>Hi {{ user.firstName }},</p>
+<p>Hi {{ user['user'].firstName }},</p>
 
-<p>username: {{ user.email }} <br />
-password: {{ pass }}</p>
+<p>username: {{ user['user'].email }} <br />
+password: {{ user['password'] }}</p>
 
-<p>Please visit link to activate your account {{ activationLink }}</p>
+<p>Please visit link to activate your account {{ user['activationLink'] }}</p>
 
 <p>Thanks,</p>
 <p>Dev Team</p>

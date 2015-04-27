@@ -35,13 +35,13 @@ class SendEmailController extends Controller
 
         $mailer = $this->get('mailer');
         $message = $mailer->createMessage()
-        ->setSubject('Test')
+        ->setSubject($data['subject'])
         ->setFrom($from)
         ->setTo($to)
         ->setBody(
             $this->renderView(
                 // app/Resources/views/Emails/registration.html.twig
-                'Emails/forgot.html.twig',
+                $data['template'],
                 array('user' => $data)
             ),
             'text/html'

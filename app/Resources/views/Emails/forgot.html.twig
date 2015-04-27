@@ -1,7 +1,7 @@
 <p>Hi {{ user['user'].firstName }}</p>
 
 
-<p>Click link to change password <a href ="{{ user['user'].resetpassLink }}">click here</a></p>
+<p>Click link to reset password <a href ="{{ url('activate_pass', { token: user['user'].resetpassLink }) }}">click here</a></p>
 
 <p>Thanks,</p>
 <p>Dev Team</p>
