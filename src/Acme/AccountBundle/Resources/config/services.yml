@@ -10,7 +10,7 @@ services:
         #arguments: [@templating, @mailer, @session]
         calls:
             - [ setContainer, [ @service_container ]]
-    validator.unique.EqualstoOldPassword:
+    validator.unique.pass:
         class: Acme\AccountBundle\Validator\Constraints\EqualstoOldPasswordValidator
         arguments: [@session]
         tags:
