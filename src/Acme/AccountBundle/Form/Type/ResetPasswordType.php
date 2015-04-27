@@ -13,7 +13,7 @@ class ResetPasswordType extends AbstractType
     {
         $builder->add('plainPassword', 'repeated', array(
            'first_name'  => 'newPassword',
-           'second_name' => 'confirm',
+           'second_name' => 'confirmPassword',
            'type'        => 'password',
         ));
         $builder->add('Submit', 'submit');

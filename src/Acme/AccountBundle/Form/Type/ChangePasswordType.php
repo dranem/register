@@ -11,13 +11,13 @@ class ChangePasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('oldPassword', 'password');
+        $builder->add('oldPassword', 'password', array('label' => 'Current Password'));
         $builder->add('newPassword', 'repeated', array(
             'type' => 'password',
             'invalid_message' => 'The password doesnt match.',
             'required' => true,
             'first_options'  => array('label' => 'New Password'),
-            'second_options' => array('label' => 'Repeat Password'),
+            'second_options' => array('label' => 'Confirm Password'),
         ));
         $builder->add('update', 'submit');
     }

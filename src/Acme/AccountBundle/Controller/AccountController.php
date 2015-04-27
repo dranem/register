@@ -365,15 +365,15 @@ class AccountController extends Controller
                     $encoder = $this->container->get('security.encoder_factory')->getEncoder($user);
                     $password = $encoder->encodePassword($data['plainPassword'], $user->getSalt());
                     $user->setPlainPassword($password);
-                    
+                    $user->setResetpassLink(null);
                     $em->flush();
-                    $this->addFlash('notice', 'Password successfully reset');
+                    $this->addFlash('notice', 'Reset password successfull');
                     return $this->redirectToRoute('login');
-                } else {
+                } /*else {
                     $user->setResetpassLink(null);
                     $this->addFlash('notice', 'Link expired');
                     return $this->redirectToRoute('forgot_pass');
-                }
+                }*/
                     
             }
         }
